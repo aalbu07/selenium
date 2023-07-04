@@ -46,7 +46,7 @@ public class Exercise4 {
 		// 1.c Get the number of releases
 		String releases = landingPage.getNrReleases();
 
-		// 1.d Create a JSON object and store the (url, releases)
+		// 1.d Create a JSON object and store the (url, releases);
 		JsonCreator.createJsonObject("url", url, "selenium-meta-data.json");
 		JsonCreator.createJsonObject("releases", releases, "selenium-meta-data.json");
 
