@@ -8,6 +8,16 @@ import java.text.SimpleDateFormat
 import java.io.BufferedReader
 import java.io.InputStreamReader
 
+    aws-java-sdk-core-1.12.375.jar
+aws-java-sdk-s3-1.12.375.jar
+aws-java-sdk-auth-1.12.375.jar
+aws-java-sdk-regions-1.12.375.jar
+httpclient-4.5.13.jar
+httpcore-4.4.15.jar
+jackson-core-2.15.1.jar
+jackson-databind-2.15.1.jar
+commons-logging-1.2.jar
+
 // Fetch properties from ReadyAPI project properties
 def bucketName = context.expand('${#Project#bucketName}')
 def bucketPath = context.expand('${#Project#bucketPath}')
