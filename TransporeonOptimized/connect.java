@@ -104,28 +104,22 @@ try {
 
 
 
-AWS SDK Core and S3:
 
-aws-java-sdk-core-2.x.x.jar
-aws-java-sdk-s3-2.x.x.jar
-AWS SDK Authentication and Utilities:
 
-aws-java-sdk-auth-2.x.x.jar (if applicable)
-aws-java-sdk-utils-2.x.x.jar (Utility classes required for various AWS SDK functionalities)
-HTTP Client Libraries:
+aws-sdk-java-core 2.20.45 JAR download
+aws-sdk-java-s3 2.20.45 JAR download
+aws-sdk-java-utils 2.20.45 JAR download
+aws-sdk-java-auth 2.20.45 JAR download
+apache httpclient 5.2.1 JAR download
+apache httpcore 5.2.1 JAR download
+jackson annotations 2.15.2 JAR download
+jackson core 2.15.2 JAR download
+jackson databind 2.15.2 JAR download
+slf4j api 1.7.36 JAR download
+slf4j simple 1.7.36 JAR download
+netty all 4.1.97.Final JAR download
+commons logging 1.2 JAR download
 
-apache-httpclient-5.x.jar (AWS SDK v2.x requires Apache HTTPClient 5.x versions)
-apache-httpcore-5.x.jar
-Jackson for JSON Processing:
-
-jackson-annotations-2.x.x.jar
-jackson-core-2.x.x.jar
-jackson-databind-2.x.x.jar
-SLF4J for Logging:
-
-slf4j-api-1.7.x.jar
-slf4j-simple-1.7.x.jar or another SLF4J binding of your choice.
-Netty (If Required for Asynchronous HTTP clients or other SDK features):
 
 netty-all-4.x.x.jar (Used for non-blocking networking)
 Commons Logging (if needed by other dependencies):
