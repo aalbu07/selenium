@@ -1,30 +1,34 @@
-// Fetch the downloaded file content from the context
-def fileContent = context.getProperty("DownloadedFileContent")
+// Retrieve the downloaded file lines from context property set in Step 1
+List<String> fileLines = context.getProperty("DownloadedFileLines")
 
-if (!fileContent) {
-    log.error("No file content found in the context. Make sure the file is downloaded properly in the previous step.")
-    assert false : "Test failed because no file content is available."
+// Ensure the file lines are not null or empty
+if (fileLines == null || fileLines.isEmpty()) {
+    log.error("File content is not available or is empty.")
+    assert false : "No file content found for parsing."
 }
 
-// Example: Parse the file content
-def lines = fileContent.split("\n")
-
-// Perform checks on specific fields
-lines.each { line ->
-    // Example check: Ensure that field number 2, starting from position 5, until position 10, has only "00000"
-    def fieldNumber = 2
-    def startPosition = 5
-    def endPosition = 10
-
-    if (line.length() >= endPosition) {
-        def fieldContent = line.substring(startPosition, endPosition)
-        if (fieldContent != "00000") {
-            log.error("Validation failed for line: '${line}' - Expected '00000' at positions 5-10, found '${fieldContent}'")
-            assert false : "Test failed due to validation error."
+try {
+    // Iterate over each line to validate the specific field
+    boolean allMatch = true
+    fileLines.each { line ->
+        // Ensure line length is sufficient for the expected field
+        if (line.length() >= 10) {
+            String field = line.substring(4, 10) // Extract characters from position 5 to 10
+            if (!field.equals("00000")) {
+                log.error("Line does not match the required pattern: ${line}")
+                allMatch = false
+            }
+        } else {
+            log.warn("Line is too short to contain the field: ${line}")
         }
-    } else {
-        log.warn("Skipping line due to insufficient length: '${line}'")
     }
-}
 
-log.info("File parsing and validation completed successfully.")
+    // Assert that all lines match the condition
+    assert allMatch : "One or more lines do not have '00000' in the specified field."
+
+    log.info("All lines have the correct field value.")
+
+} catch (Exception e) {
+    log.error("An error occurred during parsing: " + e.getMessage(), e)
+    assert false : "Test failed due to an exception during parsing: ${e.message}"
+}
