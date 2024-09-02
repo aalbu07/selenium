@@ -1,13 +1,14 @@
-import software.amazon.awssdk.auth.credentials.ProfileCredentialsProvider
-import software.amazon.awssdk.auth.credentials.WebIdentityTokenCredentialsProvider
+@Grab(group='software.amazon.awssdk', module='s3', version='2.20.58') // example version, adjust as needed
+@Grab(group='software.amazon.awssdk', module='sts', version='2.20.58')
+@Grab(group='software.amazon.awssdk', module='auth', version='2.20.58')
+
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
 import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response
 import software.amazon.awssdk.services.s3.model.S3Object
-import java.nio.charset.StandardCharsets
-import java.io.InputStream
+import software.amazon.awssdk.core.sync.ResponseInputStream
+import software.amazon.awssdk.services.s3.model.GetObjectResponse
 import java.io.BufferedReader
 import java.io.InputStreamReader
 import java.text.SimpleDateFormat
@@ -17,111 +18,88 @@ def bucketName = context.expand('${#Project#bucketName}')
 def bucketPath = context.expand('${#Project#bucketPath}')
 def certBundlePath = context.expand('${#Project#certBundlePath}')
 def certBundlePass = context.expand('${#Project#certBundlePass}')
-def regionName = context.expand('${#Project#region}')
+def region = context.expand('${#Project#region}')
 
 // Set up the SSL trust store
 System.setProperty("javax.net.ssl.trustStore", certBundlePath)
 System.setProperty("javax.net.ssl.trustStorePassword", certBundlePass)
 
 try {
-    // Determine the credentials provider based on the user’s home directory
-    def credentialsProvider
-    if (System.getProperty("os.name").toLowerCase().contains("windows")) { // Assuming this is for Windows
-        // Use the default credentials provider (AWS CLI configured credentials)
-        credentialsProvider = ProfileCredentialsProvider.create()
-    } else {
-        // For non-Windows environments, use WebIdentityTokenCredentialsProvider (e.g., for EKS)
-        credentialsProvider = WebIdentityTokenCredentialsProvider.create()
-    }
-
-    // Create the S3 client using the determined credentials provider and specified region
-    Region region = Region.of(regionName)
+    // Create the S3 client
     S3Client s3Client = S3Client.builder()
-        .credentialsProvider(credentialsProvider)
-        .region(region)
+        .region(Region.of(region))
+        .credentialsProvider(DefaultCredentialsProvider.create())
         .build()
 
-    // List all files matching the pattern SPMHARP1%s.txt
+    // List files in the bucket
     ListObjectsV2Request listObjectsReq = ListObjectsV2Request.builder()
         .bucket(bucketName)
         .prefix(bucketPath)
         .build()
-    ListObjectsV2Response listObjectsRes = s3Client.listObjectsV2(listObjectsReq)
+    
+    def listObjectsRes = s3Client.listObjectsV2(listObjectsReq)
 
-    // Filter the files by prefix and date format
-    def matchingFiles = listObjectsRes.contents().findAll { it.key().matches(/.*SPMHARP1\d{12}\.txt/) }
+    // Filter and sort files
+    def matchingFiles = listObjectsRes.contents().stream()
+        .filter { it.key().matches(/SPMHARP1\d{12}\.txt/) }
+        .sorted((a, b) -> {
+            def dateA = a.key().replaceAll(/[^\d]/, "").substring(8, 20)
+            def dateB = b.key().replaceAll(/[^\d]/, "").substring(8, 20)
+            def format = new SimpleDateFormat("yyyyMMddHHmm")
+            return format.parse(dateB) <=> format.parse(dateA)
+        })
+        .collect()
 
     if (matchingFiles.isEmpty()) {
-        throw new FileNotFoundException("No matching files found in S3 bucket.")
-    }
-
-    // Sort files by the date extracted from the file name (descending order to get the latest)
-    def sortedFiles = matchingFiles.sort { a, b ->
-        def dateA = a.key().replaceAll(/[^\d]/, "").substring(8, 20)
-        def dateB = b.key().replaceAll(/[^\d]/, "").substring(8, 20)
-        def format = new SimpleDateFormat("yyMMddHHmmss")
-        return format.parse(dateB) <=> format.parse(dateA)
+        log.error("No matching files found in the S3 bucket.")
+        assert false : "No matching files found."
     }
 
     // Get the key of the latest file
-    def latestFileKey = sortedFiles[0].key()
+    def latestFileKey = matchingFiles[0].key()
     log.info("Latest file found: " + latestFileKey)
 
-    // Get the S3 object
-    GetObjectRequest getObjectReq = GetObjectRequest.builder()
-        .bucket(bucketName)
-        .key(latestFileKey)
-        .build()
-    InputStream s3ObjectInputStream = s3Client.getObject(getObjectReq)
+    // Download the S3 object into a buffered reader for in-memory storage
+    ResponseInputStream<GetObjectResponse> s3ObjectStream = s3Client.getObject({ it.bucket(bucketName).key(latestFileKey) })
+    BufferedReader reader = new BufferedReader(new InputStreamReader(s3ObjectStream))
 
-    // Read the file content directly into memory
-    BufferedReader reader = new BufferedReader(new InputStreamReader(s3ObjectInputStream, StandardCharsets.UTF_8))
-    StringBuilder fileContent = new StringBuilder()
+    // Read the file content line by line into a List for easier manipulation
+    List<String> fileLines = []
     String line
     while ((line = reader.readLine()) != null) {
-        fileContent.append(line).append("\n")
+        fileLines.add(line)
     }
     reader.close()
 
-    // Save the file content to a context property for further processing in another script
-    context.setProperty("DownloadedFileContent", fileContent.toString())
-    log.info("File content downloaded and stored in context property.")
+    // Save the file lines to a context property for further processing in another script
+    context.setProperty("DownloadedFileLines", fileLines)
+    log.info("File content downloaded and stored in context property as a list of lines.")
 
-} catch (FileNotFoundException e) {
-    log.error("File not found: " + e.getMessage())
 } catch (Exception e) {
-    if (e.message.contains("credentials")) {
-        log.error("Incorrect AWS credentials: " + e.getMessage())
-    } else {
-        log.error("An error occurred: " + e.getMessage())
-    }
+    log.error("An error occurred: " + e.getMessage(), e)
     assert false : "Test failed due to an exception: ${e.message}"
 }
 
 
+software.amazon.awssdk s3 2.20.58
+AWS SDK for STS JAR download
 
+Copy code
+software.amazon.awssdk sts 2.20.58
+AWS SDK Core JAR download
 
+Copy code
+software.amazon.awssdk core 2.20.58
+AWS SDK Auth JAR download
 
+Copy code
+software.amazon.awssdk auth 2.20.58
+Apache Commons IO JAR download
 
+lua
+Copy code
+commons-io commons-io 2.11.0
+Apache Commons Lang JAR download
 
-
-
-aws-sdk-java-core 2.20.45 JAR download
-aws-sdk-java-s3 2.20.45 JAR download
-aws-sdk-java-utils 2.20.45 JAR download
-aws-sdk-java-auth 2.20.45 JAR download
-apache httpclient 5.2.1 JAR download
-apache httpcore 5.2.1 JAR download
-jackson annotations 2.15.2 JAR download
-jackson core 2.15.2 JAR download
-jackson databind 2.15.2 JAR download
-slf4j api 1.7.36 JAR download
-slf4j simple 1.7.36 JAR download
-netty all 4.1.97.Final JAR download
-commons logging 1.2 JAR download
-
-
-netty-all-4.x.x.jar (Used for non-blocking networking)
-Commons Logging (if needed by other dependencies):
-
-commons-logging-1.2.jar
+Copy code
+org.apache.commons commons-lang3 3.12.0
