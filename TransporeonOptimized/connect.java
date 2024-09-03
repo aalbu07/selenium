@@ -1,17 +1,23 @@
-@Grab(group='software.amazon.awssdk', module='s3', version='2.20.58') // example version, adjust as needed
-@Grab(group='software.amazon.awssdk', module='sts', version='2.20.58')
-@Grab(group='software.amazon.awssdk', module='auth', version='2.20.58')
+@Grab(group='org.apache.ivy', module='ivy', version='2.5.1')
+@Grab(group='commons-logging', module='commons-logging', version='1.2')
+@Grab(group='com.amazonaws', module='aws-java-sdk-s3', version='1.12.572')
+@Grab(group='com.amazonaws', module='aws-java-sdk-core', version='1.12.572')
+@Grab(group='software.amazon.awssdk', module='auth', version='2.20.100')
+@Grab(group='software.amazon.awssdk', module='s3', version='2.20.100')
+@Grab(group='software.amazon.awssdk', module='sts', version='2.20.100')
+@Grab(group='org.apache.commons', module='commons-lang3', version='3.12.0')
 
+// Import statements for the required classes from the libraries
+import org.apache.ivy.Ivy
+import org.apache.ivy.util.Message
+import com.amazonaws.services.s3.AmazonS3
+import com.amazonaws.services.s3.AmazonS3ClientBuilder
 import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
-import software.amazon.awssdk.regions.Region
 import software.amazon.awssdk.services.s3.S3Client
+import software.amazon.awssdk.services.s3.model.GetObjectRequest
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
-import software.amazon.awssdk.services.s3.model.S3Object
-import software.amazon.awssdk.core.sync.ResponseInputStream
-import software.amazon.awssdk.services.s3.model.GetObjectResponse
-import java.io.BufferedReader
-import java.io.InputStreamReader
-import java.text.SimpleDateFormat
+import software.amazon.awssdk.services.s3.model.ListObjectsV2Response
+import org.apache.commons.lang3.StringUtils
 
 // Fetch properties from ReadyAPI project properties
 def bucketName = context.expand('${#Project#bucketName}')
