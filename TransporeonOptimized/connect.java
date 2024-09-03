@@ -1,11 +1,12 @@
-@Grab(group='org.apache.ivy', module='ivy', version='2.5.1')
-@Grab(group='commons-logging', module='commons-logging', version='1.2')
-@Grab(group='com.amazonaws', module='aws-java-sdk-s3', version='1.12.572')
-@Grab(group='com.amazonaws', module='aws-java-sdk-core', version='1.12.572')
-@Grab(group='software.amazon.awssdk', module='auth', version='2.20.100')
-@Grab(group='software.amazon.awssdk', module='s3', version='2.20.100')
-@Grab(group='software.amazon.awssdk', module='sts', version='2.20.100')
-@Grab(group='org.apache.commons', module='commons-lang3', version='3.12.0')
+@Grab(group='org.codehaus.groovy', module='groovy-all', version='3.0.17') // Include groovy-all
+@Grab(group='org.apache.ivy', module='ivy', version='2.5.1')              // External dependency for Apache Ivy
+@Grab(group='commons-logging', module='commons-logging', version='1.2')   // External dependency for logging
+@Grab(group='com.amazonaws', module='aws-java-sdk-s3', version='1.12.572') // AWS SDK for S3 (v1)
+@Grab(group='com.amazonaws', module='aws-java-sdk-core', version='1.12.572') // AWS SDK Core (v1)
+@Grab(group='software.amazon.awssdk', module='auth', version='2.20.100')  // AWS SDK v2 auth module
+@Grab(group='software.amazon.awssdk', module='s3', version='2.20.100')    // AWS SDK v2 S3 module
+@Grab(group='software.amazon.awssdk', module='sts', version='2.20.100')   // AWS SDK v2 STS module
+@Grab(group='org.apache.commons', module='commons-lang3', version='3.12.0') // Apache Commons Lang
 
 // Import statements for the required classes from the libraries
 import org.apache.ivy.Ivy
