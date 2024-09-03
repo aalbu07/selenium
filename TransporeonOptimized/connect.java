@@ -1,14 +1,21 @@
-// Import statements for the required classes from the libraries
-import org.apache.ivy.Ivy
-import org.apache.ivy.util.Message
-import com.amazonaws.services.s3.AmazonS3
-import com.amazonaws.services.s3.AmazonS3ClientBuilder
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+// AWS SDK v2 imports
 import software.amazon.awssdk.services.s3.S3Client
-import software.amazon.awssdk.services.s3.model.GetObjectRequest
+import software.amazon.awssdk.services.s3.model.GetObjectResponse
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Request
 import software.amazon.awssdk.services.s3.model.ListObjectsV2Response
+import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider
+import software.amazon.awssdk.regions.Region
+import software.amazon.awssdk.core.sync.ResponseInputStream
+
+// Apache Commons Lang
 import org.apache.commons.lang3.StringUtils
+
+// Java standard library
+import java.io.BufferedReader
+import java.io.InputStreamReader
+import java.text.SimpleDateFormat
+import java.util.List
+import java.util.stream.Collectors
 
 // Fetch properties from ReadyAPI project properties
 def bucketName = context.expand('${#Project#bucketName}')
@@ -78,25 +85,25 @@ try {
 }
 
 
-software.amazon.awssdk s3 2.20.58
-AWS SDK for STS JAR download
+download the jars bellow:
+AWS SDK for S3:
 
-Copy code
-software.amazon.awssdk sts 2.20.58
-AWS SDK Core JAR download
+software.amazon.awssdk:s3:2.20.58
+AWS SDK for STS (if needed):
 
-Copy code
-software.amazon.awssdk core 2.20.58
-AWS SDK Auth JAR download
+software.amazon.awssdk:sts:2.20.58
+AWS SDK Core:
 
-Copy code
-software.amazon.awssdk auth 2.20.58
-Apache Commons IO JAR download
+software.amazon.awssdk:core:2.20.58
+AWS SDK Auth:
 
-lua
-Copy code
-commons-io commons-io 2.11.0
-Apache Commons Lang JAR download
+software.amazon.awssdk:auth:2.20.58
+Apache Commons IO:
+
+commons-io:commons-io:2.11.0
+Apache Commons Lang:
+
+org.apache.commons:commons-lang3:3.12.0
 
 Copy code
 org.apache.commons commons-lang3 3.12.0
