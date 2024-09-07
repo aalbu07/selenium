@@ -84,47 +84,24 @@ try {
     assert false : "Test failed due to an exception: ${e.message}"
 }
 
-
-download the jars bellow:
-AWS SDK for S3:
-
-software.amazon.awssdk:s3:2.20.58
-AWS SDK for STS (if needed):
-
-software.amazon.awssdk:sts:2.20.58
-AWS SDK Core:
-
-software.amazon.awssdk:core:2.20.58
-AWS SDK Auth:
-
-software.amazon.awssdk:auth:2.20.58
-Apache Commons IO:
-
-commons-io:commons-io:2.11.0
-Apache Commons Lang:
-
-org.apache.commons:commons-lang3:3.12.0
-
-Copy code
-org.apache.commons commons-lang3 3.12.0
-
-
-    import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Request;
-import software.amazon.awssdk.services.s3.model.ListObjectsV2Response;
-import software.amazon.awssdk.services.s3.model.S3Object;
-import software.amazon.awssdk.services.s3.model.GetObjectRequest;
-import software.amazon.awssdk.services.s3.model.GetObjectResponse;
-import software.amazon.awssdk.core.sync.ResponseInputStream;
-import software.amazon.awssdk.regions.Region;
-import software.amazon.awssdk.auth.credentials.DefaultCredentialsProvider;
-
-import java.io.BufferedReader;
-import java.io.InputStreamReader;
-import java.text.SimpleDateFormat;
-import java.util.List;
-import java.util.stream.Collectors;
-import java.util.stream.Stream;
-software.amazon.awssdk:s3:2.20.100software.amazon.awssdk:core:2.20.100software.amazon.awssdk:regions:2.20.100software.amazon.awssdk:auth:2.20.100commons-logging:commons-logging:1.2
-    
-
+aws-java-sdk-s3-2.20.100.jar
+aws-java-sdk-core-2.20.100.jar
+aws-java-sdk-sts-2.20.100.jar
+software.amazon.awssdk.auth-2.20.100.jar
+software.amazon.awssdk.regions-2.20.100.jar
+software.amazon.awssdk.http-client-spi-2.20.100.jar
+software.amazon.awssdk.http-url-connection-2.20.100.jar
+log4j-api-2.20.100.jar
+log4j-core-2.20.100.jar
+javax.net.ssl.jar
+slf4j-api-1.7.36.jar
+commons-io-2.11.0.jar
+commons-lang3-3.12.0.jar
+jackson-core-2.15.0.jar
+jackson-databind-2.15.0.jar
+jackson-annotations-2.15.0.jar
+joda-time-2.10.14.jar
+guava-31.1-jre.jar
+junit-4.13.2.jar
+httpclient-4.5.14.jar
+httpcore-4.4.16.jar
