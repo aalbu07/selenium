@@ -25,7 +25,13 @@ try {
         .withRegion(region)
         .withCredentials(new DefaultAWSCredentialsProviderChain())
         .build()
-
+  // Check if the connection to S3 is successful by performing a simple operation
+    if (s3Client.doesBucketExistV2(bucketName)) {
+        log.info("Successfully connected to S3 bucket: " + bucketName)
+    } else {
+        log.error("Failed to connect to S3 bucket: " + bucketName)
+        assert false : "Bucket does not exist or connection failed."
+    }
     // List files in the bucket
     ListObjectsV2Request listObjectsReq = new ListObjectsV2Request()
         .withBucketName(bucketName)
