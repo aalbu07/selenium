@@ -76,7 +76,11 @@ try {
     context.setProperty("DownloadedFileLines", fileLines)
     log.info("File content downloaded and stored in context property as a list of lines.")
 
-} catch (Exception e) {
-    log.error("An error occurred: " + e.getMessage(), e)
-    assert false : "Test failed due to an exception: ${e.message}"
+} catch (AmazonS3Exception e) {
+    log.error("An error occurred: " + e.getErrorMessage())
+    log.error("AWS Error Code: " + e.getErrorCode())
+    log.error("HTTP Status Code: " + e.getStatusCode())
+    log.error("AWS Request ID: " + e.getRequestId())
+    log.error("AWS Extended Request ID: " + e.getExtendedRequestId())
+    assert false : "Test failed due to an exception: " + e.getErrorMessage()
 }
